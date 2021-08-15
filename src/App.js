@@ -6,12 +6,18 @@ function App() {
   var colors = ["red", "blue", "yellow", "green", "pink", "purble", "brown", "orange", "gray"];
   const [size, setSize] = useState("");
   const [numberOfIslands, setnumberOfIslands] = useState(0);
-  var counter = 0, isStepColored = "false", rows, cols, Islands, visited, colored;
+  var counter = 0, isStepColored = "false", rows, cols, Islands, visited, colored, Size,prev=0;
 
   function setUp() {
     const myMatrix = size.split(",");
     rows = myMatrix[0];
     cols = myMatrix[1];
+    if(rows>=400&&cols>=400){
+      Size=5;
+    }
+    else{
+      Size=30;
+    }
     Islands = new Array(rows);
     visited = new Array(rows);
     colored = new Array(rows);
@@ -29,10 +35,24 @@ function App() {
     }
   }
 
+  function generateRandomColor() {
+    var letters = '0123456789ABCDEF';
+    console.log(counter)
+    for (var i = 0; i <= counter; i++) {
+      colors[i]='#';
+      for(var j=0;j<6;j++){
+      colors[i] += letters[Math.floor(Math.random() * 16)];
+    }}
+
+    doRandomizeOrSolve();
+  }
+  
+  
+
   function draw() {
     setUp();
-    document.getElementById("canvas").width = rows * 30;
-    document.getElementById("canvas").height = cols * 30;
+    document.getElementById("canvas").width = rows * Size;
+    document.getElementById("canvas").height = cols * Size;
     var canvas = document.getElementById('canvas');
     var ctx = canvas.getContext('2d');
     for (var i = 0; i < rows; i++) {
@@ -41,39 +61,39 @@ function App() {
         visited[i][j] = "false";
         colored[i][j] = -1;
         ctx.fillStyle = "white"
-        ctx.fillRect(i * 30, j * 30, 30, 30);
-        ctx.strokeRect(i * 30, j * 30, 30, 30);
-        canvas.addEventListener('click', function (event) {
-          var x = parseInt(event.offsetX / 30);
-          var y = parseInt(event.offsetY / 30);
-          console.log(parseInt(event.offsetX / 30), parseInt(event.offsetY / 30))
-          Islands[x][y] = 1
-          ctx.fillStyle = "black"
-          ctx.fillRect(x * 30, y * 30, 30, 30);
-          ctx.strokeRect(x * 30, y * 30, 30, 30);
-        });
+        ctx.fillRect(i * Size, j * Size, Size, Size);
+        ctx.strokeRect(i * Size, j * Size, Size, Size);
+        
       }
     }
+    canvas.addEventListener('click', function (event) {
+      var x = parseInt(event.offsetX / Size);
+      var y = parseInt(event.offsetY / Size);
+      console.log(parseInt(event.offsetX / Size), parseInt(event.offsetY / Size))
+      Islands[x][y] = 1
+      ctx.fillStyle = "black"
+      ctx.fillRect(x * Size, y * Size, Size, Size);
+      ctx.strokeRect(x * Size, y * Size, Size, Size);
+    });
   }
 
   function doRandomizeOrSolve() {
     if (isStepColored === "false") {
       setUp();
     }
-    document.getElementById("canvas").width = rows * 30;
-    document.getElementById("canvas").height = cols * 30;
+    
+    document.getElementById("canvas").width = rows * Size;
+    document.getElementById("canvas").height = cols * Size;
     var canvas = document.getElementById('canvas');
     var ctx = canvas.getContext('2d');
     for (var x = 0; x < rows; x++) {
       for (var y = 0; y < cols; y++) {
         var number = Math.random();
         if (isStepColored === "true" && Islands[x][y] === 1) {
-          if (counter < colors.length)
-            ctx.fillStyle = colors[colored[x][y]];
-          else
-            ctx.fillStyle = "red"
-          ctx.fillRect(x * 30, y * 30, 30, 30);
-          ctx.strokeRect(x * 30, y * 30, 30, 30);
+          console.log(colors[colored[x][y]])
+          ctx.fillStyle=colors[colored[x][y]];
+          ctx.fillRect(x * Size, y * Size, Size, Size);
+          ctx.strokeRect(x * Size, y * Size, Size, Size);
         }
         else {
           if (number < 0.2 && isStepColored === "false") {
@@ -82,10 +102,12 @@ function App() {
           }
           else
             ctx.fillStyle = "white"
-          ctx.fillRect(x * 30, y * 30, 30, 30);
-          ctx.strokeRect(x * 30, y * 30, 30, 30);
+          ctx.fillRect(x * Size, y * Size, Size, Size);
+          ctx.strokeRect(x * Size, y * Size, Size, Size);
         }
+        prev=colored[x][y];
       }
+
     }
   }
 
@@ -114,7 +136,7 @@ function App() {
       }
     }
     isStepColored = "true";
-    doRandomizeOrSolve();
+    generateRandomColor();
   }
 
   function Restart() {
